@@ -11,7 +11,7 @@ An emotional assistant that analyzes your mood and responds with:
 ## ✨ Features
 
 - **Emotion Detection**: Uses AI to analyze sentiment from text
-- **YouTube Integration**: Finds songs matching your mood (no Spotify Premium needed!)
+- **YouTube Integration**: Finds songs matching your mood with YouTube Music
 - **Voice Input**: Speak your feelings using browser speech recognition
 - **Meme Generator**: Gets mood-appropriate GIFs from GIPHY
 - **Session Management**: Each device maintains its own history
