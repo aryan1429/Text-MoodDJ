@@ -15,6 +15,7 @@ class AnalyzeResponse(BaseModel):
     track: Optional[dict] = None
     meme_url: Optional[str] = None
     quote: Optional[str] = None
+    transcribed_text: Optional[str] = None  # For voice input results
 
 class Interaction(BaseModel):
     id: int = Field(default=0)

@@ -24,6 +24,41 @@ export async function analyze(text: string) {
   return res.data;
 }
 
+export async function analyzeVoice(audioBlob: Blob) {
+  const sid = await ensureSession();
+  const formData = new FormData();
+  formData.append("audio", audioBlob, "recording.webm");
+  
+  const res = await api.post("/analyze-voice", formData, {
+    headers: { 
+      "X-Session-Id": sid,
+      "Content-Type": "multipart/form-data"
+    }
+  });
+  return res.data;
+}
+
+export async function transcribeAudio(audioBlob: Blob) {
+  const sid = await ensureSession();
+  const formData = new FormData();
+  formData.append("audio", audioBlob, "recording.webm");
+  
+  const res = await api.post("/transcribe", formData, {
+    headers: { 
+      "X-Session-Id": sid,
+      "Content-Type": "multipart/form-data"
+    }
+  });
+  return res.data;
+}
+
+export async function getSpeech(emotion: string, confidence: number = 0.8) {
+  const res = await api.get(`/speak/${emotion}?confidence=${confidence}`, {
+    responseType: 'blob'
+  });
+  return res.data;
+}
+
 export async function history() {
   const sid = await ensureSession();
   const res = await api.get("/history", {

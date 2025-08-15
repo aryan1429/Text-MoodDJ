@@ -1,0 +1,34 @@
+{
+  "folders": [
+    {
+      "name": "TextMood DJ - Backend",
+      "path": "./backend"
+    },
+    {
+      "name": "TextMood DJ - Frontend", 
+      "path": "./frontend"
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "python",
+    "typescript.preferences.includePackageJsonAutoImports": "auto",
+    "typescript.suggest.autoImports": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "eslint.workingDirectories": ["frontend"],
+    "python.linting.enabled": false,
+    "python.analysis.autoImportCompletions": true,
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "bradlc.vscode-tailwindcss",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-typescript-next"
+    ]
+  }
+}

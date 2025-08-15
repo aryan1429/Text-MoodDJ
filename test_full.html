@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎧 TextMood DJ - Full Application Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(16px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            opacity: 0.9;
+            color: white;
+        }
+
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .mode-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.7);
+            color: #333;
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .mode-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .input-section {
+            margin: 30px 0;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .voice-section {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .record-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .record-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .record-btn.recording {
+            background: linear-gradient(45deg, #ff6b6b, #dc3545);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            margin: 30px 0;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            border-left: 6px solid #667eea;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .emotion-display {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .emotion-display .emotion {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-transform: capitalize;
+            margin-bottom: 10px;
+        }
+
+        .emotion-display .confidence {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .music-section, .meme-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .music-section h3, .meme-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .track-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .track-info img {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .track-details {
+            flex: 1;
+        }
+
+        .track-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .track-artist {
+            opacity: 0.7;
+        }
+
+        .music-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .music-link {
+            padding: 10px 20px;
+            background: #ff0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .music-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .music-link.youtube-music {
+            background: #ff6600;
+        }
+
+        .meme-img {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .status.loading {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+
+        .status.listening {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .history-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .transcribed-text {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .mode-toggle {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎧 TextMood DJ</h1>
+            <div class="subtitle">✨ AI-Powered Emotion Detection with Voice & Music ✨</div>
+            <p style="color: white; opacity: 0.8; font-size: 1rem;">
+                Express your feelings through text or voice, and get personalized music recommendations + memes!
+            </p>
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="switchMode('text')">
+                ✏️ Text Mode
+            </button>
+            <button class="mode-btn" onclick="switchMode('voice')">
+                🎤 Voice Mode
+            </button>
+        </div>
+
+        <!-- Text Input Section -->
+        <div id="textSection" class="input-section">
+            <textarea 
+                id="textInput" 
+                placeholder="How are you feeling today? Describe your emotions, thoughts, or current mood..."
+                rows="4"
+            ></textarea>
+            <div class="action-buttons">
+                <button class="btn" onclick="analyzeText()" id="analyzeBtn">
+                    🧠 Analyze My Mood
+                </button>
+                <button class="btn" onclick="clearAll()">
+                    🗑️ Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Voice Input Section -->
+        <div id="voiceSection" class="input-section" style="display: none;">
+            <div class="voice-section">
+                <button class="record-btn" onclick="toggleRecording()" id="recordBtn">
+                    🎤
+                </button>
+                <div id="recordingStatus" style="margin-top: 20px; color: white; font-size: 1.1rem;">
+                    Click the microphone to start recording
+                </div>
+                <div style="margin-top: 15px; color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                    💡 Speak naturally about your feelings, mood, or emotions
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusSection"></div>
+
+        <!-- Results Section -->
+        <div id="resultSection" class="result-section">
+            <div id="emotionDisplay" class="emotion-display"></div>
+            <div id="transcribedText" class="transcribed-text" style="display: none;"></div>
+            <div id="musicSection" class="music-section" style="display: none;"></div>
+            <div id="memeSection" class="meme-section" style="display: none;"></div>
+        </div>
+
+        <!-- History Section -->
+        <div id="historySection" class="history-section" style="display: none;">
+            <h3 style="color: white; margin-bottom: 15px;">📊 Your Recent Moods</h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8001/api';
+        let currentMode = 'text';
+        let isRecording = false;
+        let mediaRecorder = null;
+        let sessionId = null;
+
+        // Initialize session on page load
+        window.onload = async () => {
+            try {
+                const response = await fetch(`${API_BASE}/session`);
+                const data = await response.json();
+                sessionId = data.session_id;
+                console.log('Session created:', sessionId);
+                loadHistory();
+            } catch (error) {
+                showStatus('❌ Could not connect to server. Make sure the backend is running on port 8000.', 'error');
+            }
+        };
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update button styles
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide sections
+            if (mode === 'text') {
+                document.getElementById('textSection').style.display = 'block';
+                document.getElementById('voiceSection').style.display = 'none';
+            } else {
+                document.getElementById('textSection').style.display = 'none';
+                document.getElementById('voiceSection').style.display = 'block';
+            }
+            
+            clearResults();
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusSection = document.getElementById('statusSection');
+            statusSection.innerHTML = `<div class="status ${type}">${message}</div>`;
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    statusSection.innerHTML = '';
+                }, 3000);
+            }
+        }
+
+        async function analyzeText() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                showStatus('⚠️ Please enter some text to analyze', 'error');
+                return;
+            }
+
+            showStatus('🧠 Analyzing your emotions...', 'loading');
+            document.getElementById('analyzeBtn').disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(sessionId && { 'X-Session-Id': sessionId })
+                    },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                displayResults(data);
+                loadHistory();
+                
+            } catch (error) {
+                showStatus('❌ Analysis failed: ' + error.message, 'error');
+            } finally {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('statusSection').innerHTML = '';
+            }
+        }
+
+        async function toggleRecording() {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                let chunks = [];
+                mediaRecorder.ondataavailable = (event) => {
+                    chunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+                    await analyzeVoice(audioBlob);
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                document.getElementById('recordBtn').classList.add('recording');
+                document.getElementById('recordBtn').textContent = '⏹️';
+                document.getElementById('recordingStatus').textContent = '🔴 Recording... Click to stop';
+                
+            } catch (error) {
+                showStatus('❌ Could not access microphone: ' + error.message, 'error');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                
+                document.getElementById('recordBtn').classList.remove('recording');
+                document.getElementById('recordBtn').textContent = '🎤';
+                document.getElementById('recordingStatus').textContent = '🎯 Processing your voice...';
+                
+                showStatus('🎤 Processing voice recording...', 'loading');
+            }
+        }
+
+        async function analyzeVoice(audioBlob) {
+            try {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.webm');
+                
+                const response = await fetch(`${API_BASE}/analyze-voice`, {
+                    method: 'POST',
+                    headers: {
+                        ...(sessionId && { 'X-Session-Id': sessionId })
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                displayResults(data, true);
+                loadHistory();
+                
+                document.getElementById('recordingStatus').textContent = 'Click the microphone to start recording';
+                
+            } catch (error) {
+                showStatus('❌ Voice analysis failed: ' + error.message, 'error');
+                document.getElementById('recordingStatus').textContent = 'Click the microphone to start recording';
+            } finally {
+                document.getElementById('statusSection').innerHTML = '';
+            }
+        }
+
+        function displayResults(data, isVoice = false) {
+            const resultSection = document.getElementById('resultSection');
+            
+            // Show emotion
+            const emotionDisplay = document.getElementById('emotionDisplay');
+            emotionDisplay.innerHTML = `
+                <div class="emotion">${getEmotionEmoji(data.emotion)} ${data.emotion}</div>
+                <div class="confidence">${(data.confidence * 100).toFixed(1)}% confidence</div>
+            `;
+            
+            // Show transcribed text for voice
+            const transcribedText = document.getElementById('transcribedText');
+            if (isVoice && data.transcribed_text) {
+                transcribedText.innerHTML = `
+                    <strong>🎤 You said:</strong><br>
+                    "${data.transcribed_text}"
+                `;
+                transcribedText.style.display = 'block';
+            } else {
+                transcribedText.style.display = 'none';
+            }
+            
+            // Show music
+            const musicSection = document.getElementById('musicSection');
+            if (data.track) {
+                musicSection.innerHTML = `
+                    <h3>🎵 Music Recommendation</h3>
+                    <div class="track-info">
+                        ${data.track.thumbnail ? `<img src="${data.track.thumbnail}" alt="thumbnail">` : ''}
+                        <div class="track-details">
+                            <div class="track-title">${data.track.track_name}</div>
+                            <div class="track-artist">${data.track.artist}</div>
+                        </div>
+                    </div>
+                    <div class="music-links">
+                        ${data.track.youtube_url ? `<a href="${data.track.youtube_url}" target="_blank" class="music-link">🎵 YouTube</a>` : ''}
+                        ${data.track.youtube_music_url ? `<a href="${data.track.youtube_music_url}" target="_blank" class="music-link youtube-music">🎧 YouTube Music</a>` : ''}
+                    </div>
+                `;
+                musicSection.style.display = 'block';
+            } else {
+                musicSection.style.display = 'none';
+            }
+            
+            // Show meme
+            const memeSection = document.getElementById('memeSection');
+            if (data.meme_url) {
+                memeSection.innerHTML = `
+                    <h3>😂 Mood Meme</h3>
+                    <img src="${data.meme_url}" alt="mood meme" class="meme-img">
+                `;
+                memeSection.style.display = 'block';
+            } else {
+                memeSection.style.display = 'none';
+            }
+            
+            resultSection.classList.add('show');
+            
+            // Update background based on emotion
+            updateBackgroundForEmotion(data.emotion);
+        }
+
+        function getEmotionEmoji(emotion) {
+            const emojis = {
+                'joy': '😊',
+                'happiness': '😊',
+                'happy': '😊',
+                'sadness': '😢',
+                'sad': '😢',
+                'anger': '😠',
+                'angry': '😠',
+                'fear': '😰',
+                'scared': '😰',
+                'surprise': '😲',
+                'surprised': '😲',
+                'disgust': '🤢',
+                'love': '😍',
+                'neutral': '😐'
+            };
+            return emojis[emotion.toLowerCase()] || '😐';
+        }
+
+        function updateBackgroundForEmotion(emotion) {
+            const gradients = {
+                'joy': 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                'happiness': 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                'happy': 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                'sadness': 'linear-gradient(135deg, #87CEEB 0%, #4682B4 100%)',
+                'sad': 'linear-gradient(135deg, #87CEEB 0%, #4682B4 100%)',
+                'anger': 'linear-gradient(135deg, #FF6B6B 0%, #DC143C 100%)',
+                'angry': 'linear-gradient(135deg, #FF6B6B 0%, #DC143C 100%)',
+                'fear': 'linear-gradient(135deg, #9370DB 0%, #483D8B 100%)',
+                'love': 'linear-gradient(135deg, #FF1493 0%, #FF69B4 100%)',
+                'neutral': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+            };
+            
+            const gradient = gradients[emotion.toLowerCase()] || gradients['neutral'];
+            document.body.style.background = gradient;
+            document.body.style.backgroundAttachment = 'fixed';
+        }
+
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/history`, {
+                    headers: sessionId ? { 'X-Session-Id': sessionId } : {}
+                });
+                const data = await response.json();
+                
+                const historySection = document.getElementById('historySection');
+                const historyList = document.getElementById('historyList');
+                
+                if (data.items && data.items.length > 0) {
+                    historyList.innerHTML = data.items.slice(0, 5).map(item => `
+                        <div class="history-item">
+                            <span>"${item.text.substring(0, 50)}${item.text.length > 50 ? '...' : ''}"</span>
+                            <span>${getEmotionEmoji(item.emotion)} ${item.emotion}</span>
+                        </div>
+                    `).join('');
+                    historySection.style.display = 'block';
+                } else {
+                    historySection.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Failed to load history:', error);
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('textInput').value = '';
+            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        }
+
+        function clearAll() {
+            clearResults();
+            document.getElementById('historySection').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

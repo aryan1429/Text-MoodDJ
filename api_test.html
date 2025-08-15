@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TextMood DJ - API Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 { 
+            text-align: center; 
+            color: #fff; 
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .test-title {
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+        .success { border-left-color: #28a745; }
+        .error { border-left-color: #dc3545; }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎧 TextMood DJ - API Test Suite</h1>
+        
+        <div class="test-section">
+            <div class="test-title">🔗 API Connection Test</div>
+            <button onclick="testConnection()">Test Server Connection</button>
+            <div id="connectionResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🆔 Session Management Test</div>
+            <button onclick="testSession()">Create Session</button>
+            <div id="sessionResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🧠 Emotion Analysis Test</div>
+            <input type="text" id="textInput" placeholder="Enter text to analyze (e.g., 'I feel happy today!')" value="I feel happy today!">
+            <button onclick="testAnalyze()">Analyze Emotion</button>
+            <div id="analyzeResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">📊 History Test</div>
+            <button onclick="testHistory()">Get Mood History</button>
+            <div id="historyResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🎵 Full Workflow Test</div>
+            <button onclick="testFullWorkflow()">Run Complete Test</button>
+            <div id="workflowResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8001/api';
+        let sessionId = null;
+
+        function showResult(elementId, content, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = content;
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+            element.style.display = 'block';
+        }
+
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_BASE.replace('/api', '')}/`);
+                const data = await response.json();
+                showResult('connectionResult', `✅ Server is running!<br><strong>Response:</strong> ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                showResult('connectionResult', `❌ Connection failed: ${error.message}`, false);
+            }
+        }
+
+        async function testSession() {
+            try {
+                const response = await fetch(`${API_BASE}/session`);
+                const data = await response.json();
+                sessionId = data.session_id;
+                showResult('sessionResult', `✅ Session created successfully!<br><strong>Session ID:</strong> ${sessionId}`);
+            } catch (error) {
+                showResult('sessionResult', `❌ Session creation failed: ${error.message}`, false);
+            }
+        }
+
+        async function testAnalyze() {
+            const text = document.getElementById('textInput').value;
+            if (!text.trim()) {
+                showResult('analyzeResult', '❌ Please enter some text to analyze', false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(sessionId && { 'X-Session-Id': sessionId })
+                    },
+                    body: JSON.stringify({ text })
+                });
+                const data = await response.json();
+                
+                let resultHtml = `✅ Emotion analysis successful!<br>`;
+                resultHtml += `<strong>Text:</strong> "${text}"<br>`;
+                resultHtml += `<strong>Emotion:</strong> ${data.emotion}<br>`;
+                resultHtml += `<strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%<br>`;
+                
+                if (data.track) {
+                    resultHtml += `<strong>Music:</strong> ${data.track.track_name} by ${data.track.artist}<br>`;
+                }
+                
+                if (data.meme_url) {
+                    resultHtml += `<strong>Meme:</strong> <img src="${data.meme_url}" style="max-width: 200px; border-radius: 8px;" alt="meme"><br>`;
+                }
+
+                showResult('analyzeResult', resultHtml);
+            } catch (error) {
+                showResult('analyzeResult', `❌ Analysis failed: ${error.message}`, false);
+            }
+        }
+
+        async function testHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/history`, {
+                    headers: sessionId ? { 'X-Session-Id': sessionId } : {}
+                });
+                const data = await response.json();
+                
+                let resultHtml = `✅ History retrieved successfully!<br>`;
+                resultHtml += `<strong>Session ID:</strong> ${data.session_id}<br>`;
+                resultHtml += `<strong>History items:</strong> ${data.items.length}<br>`;
+                
+                if (data.items.length > 0) {
+                    resultHtml += '<strong>Recent moods:</strong><ul>';
+                    data.items.slice(0, 3).forEach(item => {
+                        resultHtml += `<li>"${item.text}" → ${item.emotion}</li>`;
+                    });
+                    resultHtml += '</ul>';
+                }
+
+                showResult('historyResult', resultHtml);
+            } catch (error) {
+                showResult('historyResult', `❌ History retrieval failed: ${error.message}`, false);
+            }
+        }
+
+        async function testFullWorkflow() {
+            let resultHtml = '🚀 Running complete workflow test...<br><br>';
+            
+            try {
+                // Step 1: Create session
+                const sessionResponse = await fetch(`${API_BASE}/session`);
+                const sessionData = await sessionResponse.json();
+                sessionId = sessionData.session_id;
+                resultHtml += `✅ Step 1: Session created (${sessionId})<br>`;
+
+                // Step 2: Analyze different emotions
+                const testTexts = [
+                    'I am so happy and excited today!',
+                    'I feel really sad and down',
+                    'This makes me so angry and frustrated'
+                ];
+
+                for (let i = 0; i < testTexts.length; i++) {
+                    const analyzeResponse = await fetch(`${API_BASE}/analyze`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Session-Id': sessionId
+                        },
+                        body: JSON.stringify({ text: testTexts[i] })
+                    });
+                    const analyzeData = await analyzeResponse.json();
+                    resultHtml += `✅ Step ${i+2}: "${testTexts[i]}" → ${analyzeData.emotion} (${(analyzeData.confidence * 100).toFixed(1)}%)<br>`;
+                }
+
+                // Step 5: Get history
+                const historyResponse = await fetch(`${API_BASE}/history`, {
+                    headers: { 'X-Session-Id': sessionId }
+                });
+                const historyData = await historyResponse.json();
+                resultHtml += `✅ Step 5: Retrieved history with ${historyData.items.length} items<br><br>`;
+
+                resultHtml += '🎉 <strong>All tests passed! Your TextMood DJ API is working perfectly!</strong>';
+                showResult('workflowResult', resultHtml);
+
+            } catch (error) {
+                resultHtml += `❌ Workflow failed: ${error.message}`;
+                showResult('workflowResult', resultHtml, false);
+            }
+        }
+
+        // Auto-test connection on page load
+        window.onload = () => {
+            testConnection();
+        };
+    </script>
+</body>
+</html>

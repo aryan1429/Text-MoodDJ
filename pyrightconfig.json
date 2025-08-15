@@ -1,0 +1,16 @@
+{
+  "include": [
+    "backend"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "frontend"
+  ],
+  "reportMissingImports": false,
+  "reportMissingTypeStubs": false,
+  "reportMissingModuleSource": false,
+  "pythonVersion": "3.11",
+  "pythonPlatform": "Windows",
+  "typeCheckingMode": "off"
+}

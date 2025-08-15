@@ -7,3 +7,9 @@ pydantic
 transformers
 torch
 sentencepiece
+openai-whisper
+speechrecognition
+pyaudio
+gtts
+pydub
+python-multipart

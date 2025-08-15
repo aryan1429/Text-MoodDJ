@@ -1,0 +1,39 @@
+/* CSS custom properties for Tailwind CSS */
+/* This file helps VS Code understand Tailwind directives */
+
+/* Tailwind CSS directives - these are valid */
+/* @tailwind base; */
+/* @tailwind components; */
+/* @tailwind utilities; */
+
+/* Custom properties for emotion themes */
+:root {
+  --color-primary: #667eea;
+  --color-secondary: #764ba2;
+  --transition-duration: 0.3s;
+}
+
+/* Utility classes for emotion themes */
+.emotion-theme-joy {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+}
+
+.emotion-theme-sadness {
+  background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
+}
+
+.emotion-theme-anger {
+  background: linear-gradient(135deg, #FF6B6B 0%, #DC143C 100%);
+}
+
+.emotion-theme-fear {
+  background: linear-gradient(135deg, #9370DB 0%, #483D8B 100%);
+}
+
+.emotion-theme-love {
+  background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+}
+
+.emotion-theme-neutral {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
