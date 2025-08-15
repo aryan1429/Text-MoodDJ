@@ -8,7 +8,15 @@ type AnalyzeRes = {
   session_id: string;
   emotion: string;
   confidence: number;
-  track?: { track_name:string; artist:string; preview_url?:string; external_url:string; image?:string; };
+  track?: { 
+    track_name: string; 
+    artist: string; 
+    youtube_url?: string; 
+    youtube_music_url?: string;
+    embed_url?: string;
+    thumbnail?: string;
+    video_id?: string;
+  };
   meme_url?: string;
 };
 

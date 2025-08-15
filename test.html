@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TextMood DJ - Simple Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7fa, #f3e5f5);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; color: #333; }
+        .input-section {
+            margin: 30px 0;
+        }
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px 0 0;
+        }
+        button:hover { background: #0056b3; }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        .track-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎧 TextMood DJ</h1>
+        <p style="text-align: center; color: #666;">Tell me how you feel, and I'll find the perfect song + meme!</p>
+        
+        <div class="input-section">
+            <textarea id="moodText" rows="4" placeholder="Type how you're feeling... (e.g., 'I'm so excited and happy today!')"></textarea>
+            <br>
+            <button onclick="analyzeMood()">🎵 Analyze My Mood</button>
+            <button onclick="startListening()">🎙️ Speak Your Mood</button>
+        </div>
+        
+        <div id="result" class="result">
+            <h3 id="emotion-display"></h3>
+            <div id="track-section"></div>
+            <div id="meme-section"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        
+        async function analyzeMood() {
+            const text = document.getElementById('moodText').value.trim();
+            if (!text) {
+                alert('Please enter how you feel!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ text })
+                });
+                
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong! Make sure the backend is running.');
+            }
+        }
+        
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            const emotionDisplay = document.getElementById('emotion-display');
+            const trackSection = document.getElementById('track-section');
+            const memeSection = document.getElementById('meme-section');
+            
+            // Show emotion
+            emotionDisplay.innerHTML = `
+                <span style="font-size: 24px;">Detected Mood: <strong>${data.emotion}</strong></span>
+                <span style="color: #666; margin-left: 20px;">Confidence: ${(data.confidence * 100).toFixed(1)}%</span>
+            `;
+            
+            // Show track (YouTube)
+            if (data.track) {
+                trackSection.innerHTML = `
+                    <div class="track-info">
+                        <h4>🎵 Perfect Song for Your Mood:</h4>
+                        <p><strong>${data.track.track_name}</strong> by ${data.track.artist}</p>
+                        ${data.track.embed_url ? `<iframe src="${data.track.embed_url}" allowfullscreen></iframe>` : ''}
+                        <div style="margin-top: 10px;">
+                            ${data.track.youtube_url ? `<a href="${data.track.youtube_url}" target="_blank" style="background: #ff0000; color: white; padding: 8px 16px; text-decoration: none; border-radius: 5px; margin-right: 10px;">🎵 YouTube</a>` : ''}
+                            ${data.track.youtube_music_url ? `<a href="${data.track.youtube_music_url}" target="_blank" style="background: #ff6600; color: white; padding: 8px 16px; text-decoration: none; border-radius: 5px;">🎧 YouTube Music</a>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                trackSection.innerHTML = '<p>🔑 Add YouTube API key to get song recommendations!</p>';
+            }
+            
+            // Show meme
+            if (data.meme_url) {
+                memeSection.innerHTML = `
+                    <div style="text-align: center; margin-top: 20px;">
+                        <h4>😂 Mood Meme:</h4>
+                        <img src="${data.meme_url}" alt="mood meme" style="max-width: 100%; border-radius: 10px;">
+                    </div>
+                `;
+            } else {
+                memeSection.innerHTML = '<p>🔑 Add GIPHY API key to get memes!</p>';
+            }
+            
+            resultDiv.style.display = 'block';
+        }
+        
+        function startListening() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+                
+                recognition.onstart = () => {
+                    document.querySelector('button[onclick="startListening()"]').textContent = '🎙️ Listening...';
+                };
+                
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('moodText').value = transcript;
+                    document.querySelector('button[onclick="startListening()"]').textContent = '🎙️ Speak Your Mood';
+                };
+                
+                recognition.onerror = () => {
+                    document.querySelector('button[onclick="startListening()"]').textContent = '🎙️ Speak Your Mood';
+                    alert('Speech recognition error. Try typing instead!');
+                };
+                
+                recognition.onend = () => {
+                    document.querySelector('button[onclick="startListening()"]').textContent = '🎙️ Speak Your Mood';
+                };
+                
+                recognition.start();
+            } else {
+                alert('Speech recognition not supported in this browser. Try Chrome!');
+            }
+        }
+        
+        // Add some example prompts
+        document.addEventListener('DOMContentLoaded', function() {
+            const examples = [
+                "I'm feeling super excited about my new project!",
+                "I'm a bit sad and need some comfort music",
+                "I'm angry and frustrated with everything",
+                "I feel calm and peaceful today"
+            ];
+            
+            const exampleHTML = examples.map(ex => 
+                `<button onclick="document.getElementById('moodText').value='${ex}'" style="background: #28a745; margin: 5px;">${ex}</button>`
+            ).join('');
+            
+            document.querySelector('.input-section').innerHTML += `
+                <div style="margin-top: 15px;">
+                    <p><strong>Try these examples:</strong></p>
+                    ${exampleHTML}
+                </div>
+            ` + document.querySelector('.input-section').innerHTML;
+        });
+    </script>
+</body>
+</html>

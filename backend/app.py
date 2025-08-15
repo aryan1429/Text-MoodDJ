@@ -8,7 +8,7 @@ from typing import Optional
 
 from models import SessionCreateResponse, AnalyzeRequest, AnalyzeResponse
 from storage import init_db, new_session, touch_session, add_interaction, get_history
-from auth_spotify import search_track_by_emotion
+from auth_youtube import search_track_by_emotion
 from mood_simple import analyze_emotion  # Using simple mood for development
 import requests
 
