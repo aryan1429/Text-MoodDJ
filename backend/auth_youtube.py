@@ -1,14 +1,23 @@
 import os
 import requests
 from typing import Optional, Dict
+from custom_playlists import get_random_track_from_playlists
 
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 def search_track_by_emotion(emotion: str) -> Optional[Dict]:
     """
     Search for music videos on YouTube based on emotion
+    First tries custom playlists, then falls back to YouTube search
     Returns video info that can be played on YouTube/YouTube Music
     """
+    
+    # First, try to get a track from custom playlists
+    custom_track = get_random_track_from_playlists(emotion)
+    if custom_track:
+        return custom_track
+    
+    print(f"No custom playlists for {emotion}, using YouTube search")
     
     # Enhanced mood-to-search mapping for better music results
     mood_terms = {

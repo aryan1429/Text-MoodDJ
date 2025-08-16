@@ -10,6 +10,7 @@ from models import SessionCreateResponse, AnalyzeRequest, AnalyzeResponse
 from storage import init_db, new_session, touch_session, add_interaction, get_history
 from auth_youtube import search_track_by_emotion
 from mood_simple import analyze_emotion  # Using simple mood for development
+from custom_playlists import get_playlist_info, add_playlist_to_emotion, remove_playlist_from_emotion
 import requests
 
 load_dotenv()
@@ -98,3 +99,51 @@ def analyze(req: AnalyzeRequest, request: Request, response: Response):
 def history(request: Request, response: Response, limit: int = 10):
     sid = get_or_create_session(request, response)
     return {"session_id": sid, "items": get_history(sid, limit=limit)}
+
+# Playlist management endpoints
+@app.get("/api/playlists")
+def get_playlists():
+    """Get all configured playlists for each emotion"""
+    return get_playlist_info()
+
+@app.post("/api/playlists/{emotion}/add")
+def add_playlist(emotion: str, playlist_data: dict):
+    """Add a playlist URL to a specific emotion"""
+    playlist_url = playlist_data.get("playlist_url")
+    if not playlist_url:
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "playlist_url is required"}
+        )
+    
+    success = add_playlist_to_emotion(emotion, playlist_url)
+    if success:
+        return {"message": f"Playlist added to {emotion} emotion successfully"}
+    else:
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Failed to add playlist. Check if URL is valid or already exists."}
+        )
+
+@app.delete("/api/playlists/{emotion}/remove")
+def remove_playlist(emotion: str, playlist_data: dict):
+    """Remove a playlist URL from a specific emotion"""
+    playlist_url = playlist_data.get("playlist_url")
+    if not playlist_url:
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "playlist_url is required"}
+        )
+    
+    success = remove_playlist_from_emotion(emotion, playlist_url)
+    if success:
+        return {"message": f"Playlist removed from {emotion} emotion successfully"}
+    else:
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Playlist not found in the specified emotion."}
+        )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
