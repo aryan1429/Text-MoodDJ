@@ -93,13 +93,18 @@ def get_fallback_music(emotion: str) -> Dict:
     """
     Fallback music recommendations when YouTube API is unavailable
     """
+    # SVG data URI generator for reliable thumbnail placeholders
+    def create_thumbnail_svg(color: str, text: str) -> str:
+        svg = f'''data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180' viewBox='0 0 320 180'%3E%3Crect width='100%25' height='100%25' fill='%23{color}'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='20' font-weight='bold' fill='white'%3E{text}%3C/text%3E%3C/svg%3E'''
+        return svg
+    
     fallback_tracks = {
         "happy": {
             "track_name": "Happy - Pharrell Williams",
             "artist": "Pharrell Williams",
             "youtube_url": "https://www.youtube.com/results?search_query=happy+pharrell+williams",
             "youtube_music_url": "https://music.youtube.com/search?q=happy+pharrell+williams",
-            "thumbnail": "https://via.placeholder.com/320x180/FFD700/000000?text=Happy%2BMusic",
+            "thumbnail": create_thumbnail_svg("FFD700", "Happy Music"),
             "description": "Feel-good music to boost your mood"
         },
         "joy": {
@@ -107,7 +112,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "ABBA",
             "youtube_url": "https://www.youtube.com/results?search_query=dancing+queen+abba",
             "youtube_music_url": "https://music.youtube.com/search?q=dancing+queen+abba",
-            "thumbnail": "https://via.placeholder.com/320x180/FFD700/000000?text=Joyful%2BMusic",
+            "thumbnail": create_thumbnail_svg("FFD700", "Joyful Music"),
             "description": "Classic feel-good music to celebrate"
         },
         "sad": {
@@ -115,7 +120,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "Gary Jules",
             "youtube_url": "https://www.youtube.com/results?search_query=mad+world+gary+jules",
             "youtube_music_url": "https://music.youtube.com/search?q=mad+world+gary+jules",
-            "thumbnail": "https://via.placeholder.com/320x180/87CEEB/000000?text=Sad%2BMusic",
+            "thumbnail": create_thumbnail_svg("87CEEB", "Sad Music"),
             "description": "Contemplative music for reflection"
         },
         "anger": {
@@ -123,7 +128,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "Limp Bizkit",
             "youtube_url": "https://www.youtube.com/results?search_query=break+stuff+limp+bizkit",
             "youtube_music_url": "https://music.youtube.com/search?q=break+stuff+limp+bizkit",
-            "thumbnail": "https://via.placeholder.com/320x180/FF6B6B/000000?text=Angry%2BMusic",
+            "thumbnail": create_thumbnail_svg("FF6B6B", "Angry Music"),
             "description": "High-energy music to channel frustration"
         },
         "angry": {
@@ -131,7 +136,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "Limp Bizkit",
             "youtube_url": "https://www.youtube.com/results?search_query=break+stuff+limp+bizkit",
             "youtube_music_url": "https://music.youtube.com/search?q=break+stuff+limp+bizkit",
-            "thumbnail": "https://via.placeholder.com/320x180/FF6B6B/000000?text=Angry%2BMusic",
+            "thumbnail": create_thumbnail_svg("FF6B6B", "Angry Music"),
             "description": "High-energy music to channel frustration"
         },
         "fear": {
@@ -139,7 +144,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "Clint Mansell",
             "youtube_url": "https://www.youtube.com/results?search_query=requiem+for+a+dream+soundtrack",
             "youtube_music_url": "https://music.youtube.com/search?q=requiem+for+a+dream+soundtrack",
-            "thumbnail": "https://via.placeholder.com/320x180/9370DB/000000?text=Dark%2BMusic",
+            "thumbnail": create_thumbnail_svg("9370DB", "Dark Music"),
             "description": "Atmospheric music for intense emotions"
         },
         "surprise": {
@@ -147,7 +152,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "Mark Ronson ft. Bruno Mars",
             "youtube_url": "https://www.youtube.com/results?search_query=uptown+funk+bruno+mars",
             "youtube_music_url": "https://music.youtube.com/search?q=uptown+funk+bruno+mars",
-            "thumbnail": "https://via.placeholder.com/320x180/FFA500/000000?text=Surprise%2BMusic",
+            "thumbnail": create_thumbnail_svg("FFA500", "Surprise Music"),
             "description": "Unexpected and energetic music"
         },
         "love": {
@@ -155,7 +160,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "Ed Sheeran",
             "youtube_url": "https://www.youtube.com/results?search_query=perfect+ed+sheeran",
             "youtube_music_url": "https://music.youtube.com/search?q=perfect+ed+sheeran",
-            "thumbnail": "https://via.placeholder.com/320x180/FF1493/000000?text=Love%2BMusic",
+            "thumbnail": create_thumbnail_svg("FF1493", "Love Music"),
             "description": "Romantic music for special moments"
         },
         "neutral": {
@@ -163,7 +168,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "Marconi Union",
             "youtube_url": "https://www.youtube.com/results?search_query=weightless+marconi+union",
             "youtube_music_url": "https://music.youtube.com/search?q=weightless+marconi+union",
-            "thumbnail": "https://via.placeholder.com/320x180/808080/000000?text=Chill%2BMusic",
+            "thumbnail": create_thumbnail_svg("808080", "Chill Music"),
             "description": "Relaxing ambient music"
         },
         "disgust": {
@@ -171,7 +176,7 @@ def get_fallback_music(emotion: str) -> Dict:
             "artist": "System Of A Down",
             "youtube_url": "https://www.youtube.com/results?search_query=toxicity+system+of+a+down",
             "youtube_music_url": "https://music.youtube.com/search?q=toxicity+system+of+a+down",
-            "thumbnail": "https://via.placeholder.com/320x180/9ACD32/000000?text=Alternative%2BMusic",
+            "thumbnail": create_thumbnail_svg("9ACD32", "Alternative Music"),
             "description": "Alternative rock for strong emotions"
         }
     }

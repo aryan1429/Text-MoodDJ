@@ -13,14 +13,24 @@ from mood_simple import analyze_emotion  # Using simple mood for development
 import requests
 
 load_dotenv()
-ALLOWED_ORIGIN = os.getenv("ALLOWED_ORIGIN", "*")
+ALLOWED_ORIGIN = os.getenv("ALLOWED_ORIGIN", "http://localhost:5173")
 GIPHY_API_KEY = os.getenv("GIPHY_API_KEY")
 
 app = FastAPI(title="TextMood DJ API")
 
+# Configure CORS properly for credentials
+allowed_origins = [
+    "http://localhost:5173",  # Vite dev server
+    "http://127.0.0.1:5173",  # Alternative localhost
+    ALLOWED_ORIGIN
+] if ALLOWED_ORIGIN not in ["*", "http://localhost:5173"] else [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[ALLOWED_ORIGIN] if ALLOWED_ORIGIN != "*" else ["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
