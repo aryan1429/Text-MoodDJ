@@ -32,6 +32,11 @@ def search_track_by_emotion(emotion: str) -> Optional[Dict]:
     # Add "music" to ensure we get music videos
     search_query = f"{query} music"
     
+    # Check if API key is available
+    if not YOUTUBE_API_KEY:
+        print("YouTube API key not configured, using fallback recommendations")
+        return get_fallback_music(emotion)
+    
     try:
         # YouTube Data API v3 search endpoint
         url = "https://www.googleapis.com/youtube/v3/search"
@@ -52,7 +57,8 @@ def search_track_by_emotion(emotion: str) -> Optional[Dict]:
         items = data.get("items", [])
         
         if not items:
-            return None
+            print("No YouTube results found, using fallback")
+            return get_fallback_music(emotion)
             
         # Get the first relevant video
         video = items[0]
@@ -80,13 +86,106 @@ def search_track_by_emotion(emotion: str) -> Optional[Dict]:
         }
         
     except Exception as e:
-        print(f"YouTube API error: {e}")
-        return None
+        print(f"YouTube API error: {e}, using fallback recommendations")
+        return get_fallback_music(emotion)
+
+def get_fallback_music(emotion: str) -> Dict:
+    """
+    Fallback music recommendations when YouTube API is unavailable
+    """
+    fallback_tracks = {
+        "happy": {
+            "track_name": "Happy - Pharrell Williams",
+            "artist": "Pharrell Williams",
+            "youtube_url": "https://www.youtube.com/results?search_query=happy+pharrell+williams",
+            "youtube_music_url": "https://music.youtube.com/search?q=happy+pharrell+williams",
+            "thumbnail": "https://via.placeholder.com/320x180/FFD700/000000?text=Happy%2BMusic",
+            "description": "Feel-good music to boost your mood"
+        },
+        "joy": {
+            "track_name": "Dancing Queen - ABBA",
+            "artist": "ABBA",
+            "youtube_url": "https://www.youtube.com/results?search_query=dancing+queen+abba",
+            "youtube_music_url": "https://music.youtube.com/search?q=dancing+queen+abba",
+            "thumbnail": "https://via.placeholder.com/320x180/FFD700/000000?text=Joyful%2BMusic",
+            "description": "Classic feel-good music to celebrate"
+        },
+        "sad": {
+            "track_name": "Mad World - Gary Jules",
+            "artist": "Gary Jules",
+            "youtube_url": "https://www.youtube.com/results?search_query=mad+world+gary+jules",
+            "youtube_music_url": "https://music.youtube.com/search?q=mad+world+gary+jules",
+            "thumbnail": "https://via.placeholder.com/320x180/87CEEB/000000?text=Sad%2BMusic",
+            "description": "Contemplative music for reflection"
+        },
+        "anger": {
+            "track_name": "Break Stuff - Limp Bizkit",
+            "artist": "Limp Bizkit",
+            "youtube_url": "https://www.youtube.com/results?search_query=break+stuff+limp+bizkit",
+            "youtube_music_url": "https://music.youtube.com/search?q=break+stuff+limp+bizkit",
+            "thumbnail": "https://via.placeholder.com/320x180/FF6B6B/000000?text=Angry%2BMusic",
+            "description": "High-energy music to channel frustration"
+        },
+        "angry": {
+            "track_name": "Break Stuff - Limp Bizkit",
+            "artist": "Limp Bizkit",
+            "youtube_url": "https://www.youtube.com/results?search_query=break+stuff+limp+bizkit",
+            "youtube_music_url": "https://music.youtube.com/search?q=break+stuff+limp+bizkit",
+            "thumbnail": "https://via.placeholder.com/320x180/FF6B6B/000000?text=Angry%2BMusic",
+            "description": "High-energy music to channel frustration"
+        },
+        "fear": {
+            "track_name": "Requiem for a Dream - Clint Mansell",
+            "artist": "Clint Mansell",
+            "youtube_url": "https://www.youtube.com/results?search_query=requiem+for+a+dream+soundtrack",
+            "youtube_music_url": "https://music.youtube.com/search?q=requiem+for+a+dream+soundtrack",
+            "thumbnail": "https://via.placeholder.com/320x180/9370DB/000000?text=Dark%2BMusic",
+            "description": "Atmospheric music for intense emotions"
+        },
+        "surprise": {
+            "track_name": "Uptown Funk - Mark Ronson ft. Bruno Mars",
+            "artist": "Mark Ronson ft. Bruno Mars",
+            "youtube_url": "https://www.youtube.com/results?search_query=uptown+funk+bruno+mars",
+            "youtube_music_url": "https://music.youtube.com/search?q=uptown+funk+bruno+mars",
+            "thumbnail": "https://via.placeholder.com/320x180/FFA500/000000?text=Surprise%2BMusic",
+            "description": "Unexpected and energetic music"
+        },
+        "love": {
+            "track_name": "Perfect - Ed Sheeran",
+            "artist": "Ed Sheeran",
+            "youtube_url": "https://www.youtube.com/results?search_query=perfect+ed+sheeran",
+            "youtube_music_url": "https://music.youtube.com/search?q=perfect+ed+sheeran",
+            "thumbnail": "https://via.placeholder.com/320x180/FF1493/000000?text=Love%2BMusic",
+            "description": "Romantic music for special moments"
+        },
+        "neutral": {
+            "track_name": "Weightless - Marconi Union",
+            "artist": "Marconi Union",
+            "youtube_url": "https://www.youtube.com/results?search_query=weightless+marconi+union",
+            "youtube_music_url": "https://music.youtube.com/search?q=weightless+marconi+union",
+            "thumbnail": "https://via.placeholder.com/320x180/808080/000000?text=Chill%2BMusic",
+            "description": "Relaxing ambient music"
+        },
+        "disgust": {
+            "track_name": "Toxicity - System Of A Down",
+            "artist": "System Of A Down",
+            "youtube_url": "https://www.youtube.com/results?search_query=toxicity+system+of+a+down",
+            "youtube_music_url": "https://music.youtube.com/search?q=toxicity+system+of+a+down",
+            "thumbnail": "https://via.placeholder.com/320x180/9ACD32/000000?text=Alternative%2BMusic",
+            "description": "Alternative rock for strong emotions"
+        }
+    }
+    
+    # Get fallback track for emotion, default to neutral
+    return fallback_tracks.get(emotion.lower(), fallback_tracks["neutral"])
 
 def get_video_details(video_id: str) -> Optional[Dict]:
     """
     Get additional details about a specific video
     """
+    if not YOUTUBE_API_KEY:
+        return None
+        
     try:
         url = "https://www.googleapis.com/youtube/v3/videos"
         params = {
