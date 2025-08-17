@@ -19,20 +19,61 @@ def search_track_by_emotion(emotion: str) -> Optional[Dict]:
     
     print(f"No custom playlists for {emotion}, using YouTube search")
     
-    # Enhanced mood-to-search mapping for better music results
+    # Enhanced mood-to-search mapping for better music results with more emotions
     mood_terms = {
+        # Core emotions
         "happy": "happy upbeat music feel good songs",
-        "sad": "sad emotional music heartbreak songs", 
-        "angry": "angry rock metal intense music",
-        "fear": "dark ambient scary music",
-        "surprise": "surprising uplifting electronic music",
-        "neutral": "chill lofi beats relaxing music",
-        "calm": "calm peaceful acoustic music meditation",
-        "excited": "party hype energetic dance music",
-        "disgust": "alternative grunge rock music",
-        "joy": "joyful celebration happy music",
-        "love": "romantic love songs music",
-        "anxious": "calming anxiety relief music"
+        "joy": "joyful celebration happy energetic music",
+        "sad": "sad emotional music heartbreak melancholy songs", 
+        "sadness": "sad emotional music heartbreak melancholy songs",
+        "angry": "angry rock metal intense aggressive music",
+        "anger": "angry rock metal intense aggressive music",
+        "fear": "dark ambient scary atmospheric music",
+        "surprise": "surprising uplifting electronic exciting music",
+        "disgust": "alternative grunge rock intense music",
+        "love": "romantic love songs ballads soulful music",
+        "neutral": "chill lofi beats relaxing ambient music",
+        
+        # Extended emotions
+        "calm": "calm peaceful acoustic meditation ambient music",
+        "peaceful": "peaceful serene tranquil relaxing music",
+        "excited": "party hype energetic dance electronic music",
+        "energetic": "energetic upbeat dance workout music",
+        "anxious": "calming anxiety relief meditation peaceful music",
+        "worried": "soothing calming reassuring peaceful music",
+        "confident": "confident empowering motivational upbeat music",
+        "motivated": "motivational inspiring uplifting energetic music",
+        "grateful": "grateful thankful uplifting spiritual music",
+        "blessed": "blessed spiritual uplifting grateful music",
+        "lonely": "comforting companionship melancholy emotional music",
+        "heartbroken": "heartbreak sad emotional healing music",
+        "overwhelmed": "calming stress relief peaceful meditation music",
+        "stressed": "stress relief calming peaceful relaxing music",
+        "tired": "gentle soothing restful peaceful music",
+        "confused": "clarity peaceful contemplative ambient music",
+        "hopeful": "hopeful uplifting inspiring positive music",
+        "optimistic": "optimistic positive upbeat cheerful music",
+        "nostalgic": "nostalgic retro emotional throwback music",
+        "melancholy": "melancholy bittersweet emotional contemplative music",
+        "euphoric": "euphoric ecstatic high energy dance music",
+        "ecstatic": "ecstatic euphoric celebration party music",
+        "romantic": "romantic love ballads intimate soulful music",
+        "passionate": "passionate intense emotional powerful music",
+        "tender": "tender gentle soft acoustic intimate music",
+        "dreamy": "dreamy ethereal ambient atmospheric music",
+        "mysterious": "mysterious dark atmospheric ambient music",
+        "playful": "playful fun upbeat quirky music",
+        "silly": "silly fun playful upbeat comedy music",
+        "serious": "serious contemplative deep thoughtful music",
+        "intense": "intense powerful dramatic emotional music",
+        "gentle": "gentle soft soothing peaceful music",
+        "wild": "wild energetic party dance music",
+        "free": "freedom liberating uplifting soaring music",
+        "trapped": "liberation freedom breaking free music",
+        "proud": "proud triumphant victorious empowering music",
+        "accomplished": "accomplished successful triumphant celebratory music",
+        "defeated": "healing recovery uplifting motivational music",
+        "victorious": "victorious triumphant celebration winning music"
     }
     
     # Get search query for the emotion
