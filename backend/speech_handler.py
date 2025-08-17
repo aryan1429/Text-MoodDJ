@@ -25,11 +25,17 @@ def transcribe_audio_file(audio_file_path: str) -> str:
         Transcribed text
     """
     try:
+        print(f"Loading Whisper model for transcription...")
         model = load_whisper_model()
+        print(f"Transcribing file: {audio_file_path}")
         result = model.transcribe(audio_file_path)
-        return result["text"].strip()
+        transcribed_text = result["text"].strip()
+        print(f"Whisper transcription successful: '{transcribed_text}'")
+        return transcribed_text
     except Exception as e:
         print(f"Whisper transcription error: {e}")
+        import traceback
+        traceback.print_exc()
         return ""
 
 def transcribe_audio_data(audio_data: bytes, format: str = "webm") -> str:
@@ -42,20 +48,35 @@ def transcribe_audio_data(audio_data: bytes, format: str = "webm") -> str:
         Transcribed text
     """
     try:
+        print(f"Starting transcription of {len(audio_data)} bytes in {format} format")
+        
+        # Validate input
+        if len(audio_data) == 0:
+            print("Error: Empty audio data")
+            return ""
+        
         # Save audio data to temporary file
         with tempfile.NamedTemporaryFile(suffix=f".{format}", delete=False) as temp_file:
             temp_file.write(audio_data)
             temp_file_path = temp_file.name
         
+        print(f"Saved audio to temporary file: {temp_file_path}")
+        
         # Transcribe using Whisper
         text = transcribe_audio_file(temp_file_path)
         
         # Clean up temporary file
-        os.unlink(temp_file_path)
+        try:
+            os.unlink(temp_file_path)
+            print(f"Cleaned up temporary file: {temp_file_path}")
+        except Exception as cleanup_error:
+            print(f"Warning: Could not clean up temporary file {temp_file_path}: {cleanup_error}")
         
         return text
     except Exception as e:
         print(f"Audio transcription error: {e}")
+        import traceback
+        traceback.print_exc()
         return ""
 
 def text_to_speech(text: str, lang: str = "en") -> bytes:

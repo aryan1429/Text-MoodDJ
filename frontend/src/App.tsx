@@ -45,11 +45,16 @@ export default function App() {
   async function runAnalyzeVoice(audioBlob: Blob) {
     setLoading(true);
     try {
+      console.log('Starting voice analysis with blob:', audioBlob);
       const data = await analyzeVoice(audioBlob);
+      console.log('Voice analysis result:', data);
       setRes(data);
       setCurrentEmotion(data.emotion);
       const h = await history();
       setHist(h.items || []);
+    } catch (error: any) {
+      console.error('Voice analysis error:', error);
+      alert(`Voice analysis failed: ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
     }

@@ -9,10 +9,23 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: true
+    host: true,
+    // Reduce noise from extensions in console
+    fs: {
+      strict: false
+    }
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
-  }
+    sourcemap: true,
+    // Reduce bundle analyzer noise
+    rollupOptions: {
+      external: [],
+      output: {
+        manualChunks: undefined
+      }
+    }
+  },
+  // Suppress some development warnings
+  logLevel: 'info'
 })

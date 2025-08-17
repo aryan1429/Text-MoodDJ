@@ -31,8 +31,8 @@ export async function analyzeVoice(audioBlob: Blob) {
   
   const res = await api.post("/analyze-voice", formData, {
     headers: { 
-      "X-Session-Id": sid,
-      "Content-Type": "multipart/form-data"
+      "X-Session-Id": sid
+      // Don't set Content-Type - let browser set it automatically with boundary
     }
   });
   return res.data;

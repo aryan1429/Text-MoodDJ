@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface VoiceRecorderProps {
   onRecordingComplete: (audioBlob: Blob) => void;
@@ -12,6 +12,18 @@ export default function VoiceRecorder({ onRecordingComplete, disabled }: VoiceRe
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | null>(null);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
   const startRecording = async () => {
     try {
@@ -42,8 +54,10 @@ export default function VoiceRecorder({ onRecordingComplete, disabled }: VoiceRe
         
         // Clean up
         stream.getTracks().forEach(track => track.stop());
+        setIsRecording(false); // Ensure recording state is reset
         if (timerRef.current) {
           clearInterval(timerRef.current);
+          timerRef.current = null;
         }
       };
 
@@ -58,10 +72,12 @@ export default function VoiceRecorder({ onRecordingComplete, disabled }: VoiceRe
   const stopRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+    }
+    // Always set recording to false and clear timer, regardless of MediaRecorder state
+    setIsRecording(false);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
   };
 
@@ -109,7 +125,7 @@ export default function VoiceRecorder({ onRecordingComplete, disabled }: VoiceRe
         
         {/* Recording pulse effect */}
         {isRecording && (
-          <div className="absolute inset-0 rounded-full border-4 border-red-400 animate-ping opacity-30"></div>
+          <div className="absolute inset-0 rounded-full border-4 border-red-400 animate-ping opacity-30 pointer-events-none"></div>
         )}
       </div>
       
