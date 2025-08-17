@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { analyze, history, analyzeVoice } from "./api";
+import { analyze, history } from "./api";
 import MoodInput from "./components/MoodInput";
 import ResultCard from "./components/ResultCard";
 import HistoryList from "./components/HistoryList";
@@ -19,12 +19,10 @@ type AnalyzeRes = {
     video_id?: string;
   };
   meme_url?: string;
-  transcribed_text?: string;
 };
 
 export default function App() {
   const [loading, setLoading] = useState(false);
-  const [listening, setListening] = useState(false);
   const [res, setRes] = useState<AnalyzeRes|null>(null);
   const [hist, setHist] = useState<Array<{id: number; text: string; emotion: string; created_at: string}>>([]);
   const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
@@ -37,24 +35,6 @@ export default function App() {
       setCurrentEmotion(data.emotion);
       const h = await history();
       setHist(h.items || []);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function runAnalyzeVoice(audioBlob: Blob) {
-    setLoading(true);
-    try {
-      console.log('Starting voice analysis with blob:', audioBlob);
-      const data = await analyzeVoice(audioBlob);
-      console.log('Voice analysis result:', data);
-      setRes(data);
-      setCurrentEmotion(data.emotion);
-      const h = await history();
-      setHist(h.items || []);
-    } catch (error: any) {
-      console.error('Voice analysis error:', error);
-      alert(`Voice analysis failed: ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
     }
@@ -98,7 +78,7 @@ export default function App() {
             className="text-base opacity-90 max-w-2xl mx-auto"
             style={{ color: theme.text }}
           >
-            Tell me how you feel through text or voice; I'll analyze your emotions and find the perfect music & memes! 🎵😂
+            Tell me how you feel through text; I'll analyze your emotions and find the perfect music & memes! 🎵😂
           </div>
         </header>
 
@@ -112,25 +92,11 @@ export default function App() {
         >
           <MoodInput 
             onSubmit={runAnalyze} 
-            onVoiceSubmit={runAnalyzeVoice}
-            onListening={setListening} 
             loading={loading}
           />
         </div>
 
         {/* Status Messages */}
-        {listening && (
-          <div 
-            className="text-center p-4 rounded-xl shadow-md animate-pulse"
-            style={{ 
-              backgroundColor: theme.secondary,
-              color: theme.accent 
-            }}
-          >
-            🎙️ Listening... Speak your heart out!
-          </div>
-        )}
-        
         {loading && (
           <div 
             className="text-center p-4 rounded-xl shadow-md"
@@ -154,7 +120,6 @@ export default function App() {
               confidence={res.confidence}
               track={res.track}
               meme_url={res.meme_url}
-              transcribed_text={res.transcribed_text}
             />
           </div>
         )}

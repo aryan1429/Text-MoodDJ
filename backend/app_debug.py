@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Request, Response, Depends, File, UploadFile
+from fastapi import FastAPI, Request, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -11,7 +11,6 @@ from storage import init_db, new_session, touch_session, add_interaction, get_hi
 from auth_youtube import search_track_by_emotion
 from mood_simple import analyze_emotion
 from custom_playlists import get_playlist_info, add_playlist_to_emotion, remove_playlist_from_emotion
-# from speech_handler import transcribe_audio_data  # Comment out for debugging
 import requests
 
 load_dotenv()
@@ -92,74 +91,6 @@ async def analyze(request: Request, response: Response, req: AnalyzeRequest):
         meme_url=meme_url,
         quote=None
     )
-
-@app.post("/api/analyze-voice", response_model=AnalyzeResponse)
-async def analyze_voice(
-    request: Request, 
-    response: Response,
-    audio: UploadFile = File(...)
-):
-    try:
-        print(f"=== Voice Analysis Request Started ===")
-        sid = get_or_create_session(request, response)
-        print(f"Session ID: {sid}")
-        
-        # Read audio data
-        audio_data = await audio.read()
-        print(f"Received audio file: {audio.filename}, size: {len(audio_data)} bytes, content-type: {audio.content_type}")
-        
-        # Validate audio data
-        if len(audio_data) == 0:
-            print("Error: Empty audio data received")
-            return JSONResponse(
-                status_code=400, 
-                content={"detail": "Empty audio data received. Please try recording again."}
-            )
-        
-        # For debugging, let's use dummy transcription instead of actual Whisper
-        transcribed_text = "test speech for debugging"
-        print(f"Dummy transcribed text: '{transcribed_text}'")
-        
-        # Analyze emotion from transcribed text
-        emotion, conf = analyze_emotion(transcribed_text)
-        track = search_track_by_emotion(emotion)
-
-        # GIPHY
-        meme_url = None
-        try:
-            g = requests.get(
-                "https://api.giphy.com/v1/gifs/search",
-                params={"api_key": GIPHY_API_KEY, "q": emotion, "limit": 10, "rating": "pg"},
-                timeout=10
-            )
-            g.raise_for_status()
-            data = g.json().get("data", [])
-            if data:
-                meme_url = data[0]["images"]["original"]["url"]
-        except Exception as e:
-            print(f"GIPHY error: {e}")
-            meme_url = None
-
-        # Store the transcribed text in the database
-        add_interaction(sid, transcribed_text, emotion)
-
-        return AnalyzeResponse(
-            session_id=sid,
-            emotion=emotion,
-            confidence=conf,
-            track=track,
-            meme_url=meme_url,
-            transcribed_text=transcribed_text  # Include transcribed text in response
-        )
-    
-    except Exception as e:
-        print(f"Error in analyze_voice: {e}")
-        import traceback
-        traceback.print_exc()
-        return JSONResponse(
-            status_code=500,
-            content={"detail": f"Internal server error: {str(e)}"}
-        )
 
 @app.get("/api/health")
 async def health():

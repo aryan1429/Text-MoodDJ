@@ -94,40 +94,6 @@
             min-height: 120px;
         }
 
-        .voice-section {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .record-btn {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: none;
-            font-size: 3rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-
-        .record-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        }
-
-        .record-btn.recording {
-            background: linear-gradient(45deg, #ff6b6b, #dc3545);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -308,15 +274,6 @@
             border-left: 4px solid #667eea;
         }
 
-        .transcribed-text {
-            background: rgba(52, 152, 219, 0.1);
-            border: 1px solid rgba(52, 152, 219, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-style: italic;
-        }
-
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -343,20 +300,10 @@
     <div class="container">
         <div class="header">
             <h1>🎧 TextMood DJ</h1>
-            <div class="subtitle">✨ AI-Powered Emotion Detection with Voice & Music ✨</div>
+            <div class="subtitle">✨ AI-Powered Emotion Detection & Music ✨</div>
             <p style="color: white; opacity: 0.8; font-size: 1rem;">
-                Express your feelings through text or voice, and get personalized music recommendations + memes!
+                Express your feelings through text, and get personalized music recommendations + memes!
             </p>
-        </div>
-
-        <!-- Mode Toggle -->
-        <div class="mode-toggle">
-            <button class="mode-btn active" onclick="switchMode('text')">
-                ✏️ Text Mode
-            </button>
-            <button class="mode-btn" onclick="switchMode('voice')">
-                🎤 Voice Mode
-            </button>
         </div>
 
         <!-- Text Input Section -->
@@ -376,28 +323,12 @@
             </div>
         </div>
 
-        <!-- Voice Input Section -->
-        <div id="voiceSection" class="input-section" style="display: none;">
-            <div class="voice-section">
-                <button class="record-btn" onclick="toggleRecording()" id="recordBtn">
-                    🎤
-                </button>
-                <div id="recordingStatus" style="margin-top: 20px; color: white; font-size: 1.1rem;">
-                    Click the microphone to start recording
-                </div>
-                <div style="margin-top: 15px; color: rgba(255,255,255,0.8); font-size: 0.9rem;">
-                    💡 Speak naturally about your feelings, mood, or emotions
-                </div>
-            </div>
-        </div>
-
         <!-- Status Messages -->
         <div id="statusSection"></div>
 
         <!-- Results Section -->
         <div id="resultSection" class="result-section">
             <div id="emotionDisplay" class="emotion-display"></div>
-            <div id="transcribedText" class="transcribed-text" style="display: none;"></div>
             <div id="musicSection" class="music-section" style="display: none;"></div>
             <div id="memeSection" class="meme-section" style="display: none;"></div>
         </div>
@@ -411,9 +342,6 @@
 
     <script>
         const API_BASE = 'http://127.0.0.1:8001/api';
-        let currentMode = 'text';
-        let isRecording = false;
-        let mediaRecorder = null;
         let sessionId = null;
 
         // Initialize session on page load
@@ -428,25 +356,6 @@
                 showStatus('❌ Could not connect to server. Make sure the backend is running on port 8000.', 'error');
             }
         };
-
-        function switchMode(mode) {
-            currentMode = mode;
-            
-            // Update button styles
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Show/hide sections
-            if (mode === 'text') {
-                document.getElementById('textSection').style.display = 'block';
-                document.getElementById('voiceSection').style.display = 'none';
-            } else {
-                document.getElementById('textSection').style.display = 'none';
-                document.getElementById('voiceSection').style.display = 'block';
-            }
-            
-            clearResults();
-        }
 
         function showStatus(message, type = 'info') {
             const statusSection = document.getElementById('statusSection');
@@ -491,83 +400,7 @@
             }
         }
 
-        async function toggleRecording() {
-            if (!isRecording) {
-                startRecording();
-            } else {
-                stopRecording();
-            }
-        }
-
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                
-                let chunks = [];
-                mediaRecorder.ondataavailable = (event) => {
-                    chunks.push(event.data);
-                };
-                
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-                    await analyzeVoice(audioBlob);
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                
-                mediaRecorder.start();
-                isRecording = true;
-                
-                document.getElementById('recordBtn').classList.add('recording');
-                document.getElementById('recordBtn').textContent = '⏹️';
-                document.getElementById('recordingStatus').textContent = '🔴 Recording... Click to stop';
-                
-            } catch (error) {
-                showStatus('❌ Could not access microphone: ' + error.message, 'error');
-            }
-        }
-
-        function stopRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                
-                document.getElementById('recordBtn').classList.remove('recording');
-                document.getElementById('recordBtn').textContent = '🎤';
-                document.getElementById('recordingStatus').textContent = '🎯 Processing your voice...';
-                
-                showStatus('🎤 Processing voice recording...', 'loading');
-            }
-        }
-
-        async function analyzeVoice(audioBlob) {
-            try {
-                const formData = new FormData();
-                formData.append('audio', audioBlob, 'recording.webm');
-                
-                const response = await fetch(`${API_BASE}/analyze-voice`, {
-                    method: 'POST',
-                    headers: {
-                        ...(sessionId && { 'X-Session-Id': sessionId })
-                    },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                displayResults(data, true);
-                loadHistory();
-                
-                document.getElementById('recordingStatus').textContent = 'Click the microphone to start recording';
-                
-            } catch (error) {
-                showStatus('❌ Voice analysis failed: ' + error.message, 'error');
-                document.getElementById('recordingStatus').textContent = 'Click the microphone to start recording';
-            } finally {
-                document.getElementById('statusSection').innerHTML = '';
-            }
-        }
-
-        function displayResults(data, isVoice = false) {
+        function displayResults(data) {
             const resultSection = document.getElementById('resultSection');
             
             // Show emotion
@@ -576,18 +409,6 @@
                 <div class="emotion">${getEmotionEmoji(data.emotion)} ${data.emotion}</div>
                 <div class="confidence">${(data.confidence * 100).toFixed(1)}% confidence</div>
             `;
-            
-            // Show transcribed text for voice
-            const transcribedText = document.getElementById('transcribedText');
-            if (isVoice && data.transcribed_text) {
-                transcribedText.innerHTML = `
-                    <strong>🎤 You said:</strong><br>
-                    "${data.transcribed_text}"
-                `;
-                transcribedText.style.display = 'block';
-            } else {
-                transcribedText.style.display = 'none';
-            }
             
             // Show music
             const musicSection = document.getElementById('musicSection');

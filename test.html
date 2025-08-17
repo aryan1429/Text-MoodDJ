@@ -166,7 +166,6 @@
             <textarea id="moodText" rows="4" placeholder="Type how you're feeling... (e.g., 'I'm so excited and happy today!')"></textarea>
             <br>
             <button onclick="analyzeMood()">🎵 Analyze My Mood</button>
-            <button onclick="startListening()">🎙️ Speak Your Mood</button>
         </div>
         
         <div id="result" class="result">
@@ -246,40 +245,6 @@
             }
             
             resultDiv.style.display = 'block';
-        }
-        
-        function startListening() {
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-                const recognition = new SpeechRecognition();
-                
-                recognition.lang = 'en-US';
-                recognition.interimResults = false;
-                recognition.maxAlternatives = 1;
-                
-                recognition.onstart = () => {
-                    document.querySelector('button[onclick="startListening()"]').textContent = '🎙️ Listening...';
-                };
-                
-                recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById('moodText').value = transcript;
-                    document.querySelector('button[onclick="startListening()"]').textContent = '🎙️ Speak Your Mood';
-                };
-                
-                recognition.onerror = () => {
-                    document.querySelector('button[onclick="startListening()"]').textContent = '🎙️ Speak Your Mood';
-                    alert('Speech recognition error. Try typing instead!');
-                };
-                
-                recognition.onend = () => {
-                    document.querySelector('button[onclick="startListening()"]').textContent = '🎙️ Speak Your Mood';
-                };
-                
-                recognition.start();
-            } else {
-                alert('Speech recognition not supported in this browser. Try Chrome!');
-            }
         }
         
         // Add some example prompts

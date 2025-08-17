@@ -13,10 +13,9 @@ type Props = {
     video_id?: string;
   };
   meme_url?: string;
-  transcribed_text?: string;
 };
 
-export default function ResultCard({ emotion, confidence, track, meme_url, transcribed_text }: Props) {
+export default function ResultCard({ emotion, confidence, track, meme_url }: Props) {
   const theme = getEmotionTheme(emotion);
   const animation = getEmotionAnimation(emotion);
 
@@ -50,24 +49,6 @@ export default function ResultCard({ emotion, confidence, track, meme_url, trans
           {(confidence*100).toFixed(1)}% confident
         </div>
       </div>
-
-      {/* Show transcribed text if available (for voice input) */}
-      {transcribed_text && (
-        <div 
-          className="p-4 rounded-lg border-l-4 shadow-md"
-          style={{ 
-            backgroundColor: theme.secondary,
-            borderLeftColor: theme.primary 
-          }}
-        >
-          <div className="text-sm font-medium mb-1" style={{ color: theme.accent }}>
-            🎤 You said:
-          </div>
-          <div className="italic" style={{ color: theme.text }}>
-            "{transcribed_text}"
-          </div>
-        </div>
-      )}
 
       {track && (
         <div className="flex flex-col gap-4">
