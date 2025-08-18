@@ -1,4 +1,5 @@
 import os
+import random
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -82,13 +83,15 @@ def analyze(req: AnalyzeRequest, request: Request, response: Response):
     try:
         g = requests.get(
             "https://api.giphy.com/v1/gifs/search",
-            params={"api_key": GIPHY_API_KEY, "q": emotion, "limit": 10, "rating": "pg"},
+            params={"api_key": GIPHY_API_KEY, "q": emotion, "limit": 25, "rating": "pg"},
             timeout=10
         )
         g.raise_for_status()
         data = g.json().get("data", [])
         if data:
-            meme_url = data[0]["images"]["original"]["url"]
+            # Randomly select a meme from the results
+            random_meme = random.choice(data)
+            meme_url = random_meme["images"]["original"]["url"]
     except Exception:
         meme_url = None
 

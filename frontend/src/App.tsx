@@ -29,6 +29,7 @@ export default function App() {
 
   async function runAnalyze(text: string) {
     setLoading(true);
+    setRes(null); // Clear previous result immediately
     try {
       const data = await analyze(text);
       setRes(data);
@@ -115,7 +116,7 @@ export default function App() {
         )}
 
         {/* Results Section */}
-        {res && (
+        {res && !loading && (
           <div className="transform transition-all duration-500 animate-fadeIn">
             <ResultCard
               emotion={res.emotion}
