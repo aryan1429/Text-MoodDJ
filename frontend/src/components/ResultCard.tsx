@@ -1,4 +1,4 @@
-import { getEmotionTheme, getEmotionAnimation } from '../utils/emotionThemes';
+import { getEmotionTheme } from '../utils/emotionThemes';
 
 type Props = {
   emotion: string;
@@ -17,11 +17,10 @@ type Props = {
 
 export default function ResultCard({ emotion, confidence, track, meme_url }: Props) {
   const theme = getEmotionTheme(emotion);
-  const animation = getEmotionAnimation(emotion);
 
   return (
     <div 
-      className={`rounded-2xl shadow-lg p-6 flex flex-col gap-4 transition-all duration-500 transform hover:scale-105 ${animation}`}
+      className="rounded-2xl shadow-lg p-6 flex flex-col gap-4 transition-all duration-500"
       style={{ 
         background: theme.background,
         borderLeft: `6px solid ${theme.accent}`,
@@ -31,7 +30,7 @@ export default function ResultCard({ emotion, confidence, track, meme_url }: Pro
       {/* Emotion Header with Enhanced Styling */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="text-4xl animate-pulse">{theme.emoji}</div>
+          <div className="text-4xl">{theme.emoji}</div>
           <div>
             <div className="text-2xl font-bold capitalize" style={{ color: theme.accent }}>
               {theme.icon} {emotion}
@@ -69,7 +68,7 @@ export default function ResultCard({ emotion, confidence, track, meme_url }: Pro
               <img 
                 src={track.thumbnail} 
                 alt="video thumbnail" 
-                className="w-24 h-18 rounded-xl object-cover shadow-md hover:scale-110 transition-transform duration-300" 
+                className="w-24 h-18 rounded-xl object-cover shadow-md" 
               />
             )}
             <div className="flex flex-col">
@@ -105,7 +104,7 @@ export default function ResultCard({ emotion, confidence, track, meme_url }: Pro
                 href={track.youtube_url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                className="px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg"
                 style={{ 
                   backgroundColor: '#FF0000', 
                   color: 'white' 
@@ -119,7 +118,7 @@ export default function ResultCard({ emotion, confidence, track, meme_url }: Pro
                 href={track.youtube_music_url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                className="px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg"
                 style={{ 
                   backgroundColor: '#FF6600', 
                   color: 'white' 
@@ -141,7 +140,7 @@ export default function ResultCard({ emotion, confidence, track, meme_url }: Pro
             </div>
           </div>
           <div 
-            className="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300"
+            className="rounded-xl overflow-hidden shadow-lg"
             style={{ borderColor: theme.primary }}
           >
             <img 
