@@ -50,6 +50,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get("/")
+def health():
+    return {"status": "ok", "service": "textmood-dj backend"}
+
 def get_or_create_session(request: Request, response: Response) -> str:
     # check header or cookie
     sid = request.headers.get("X-Session-Id") or request.cookies.get("session_id")
