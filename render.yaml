@@ -3,5 +3,7 @@ services:
     name: textmood-dj-backend
     env: python
     plan: free
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: bash backend/start.sh
+  # run commands from the `backend` directory (monorepo support)
+  root: backend
+  buildCommand: pip install -r requirements.txt
+  startCommand: bash start.sh
