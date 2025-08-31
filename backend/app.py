@@ -29,23 +29,40 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="TextMood DJ API", lifespan=lifespan)
 
 # Configure CORS properly for credentials
-allowed_origins = [
-    "http://localhost:5173",  # Vite dev server default
-    "http://127.0.0.1:5173",  # Alternative localhost
-    "http://localhost:5174",  # Vite dev server alternate port
-    "http://127.0.0.1:5174",  # Alternative localhost
-    ALLOWED_ORIGIN
-] if ALLOWED_ORIGIN not in ["*", "http://localhost:5173"] else [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174"
-]
+# ALLOWED_ORIGIN may be:
+# - a single origin string (e.g. https://text-mood-dj.vercel.app)
+# - a comma-separated list of origins
+# - '*' to allow all origins (credentials will be disabled in that case)
+def _build_allowed_origins(env_val: str):
+    defaults = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+    ]
+
+    if not env_val:
+        return defaults
+
+    env_val = env_val.strip()
+    if env_val == "*":
+        return ["*"]
+
+    # support comma-separated list of origins
+    parts = [p.strip() for p in env_val.split(",") if p.strip()]
+    # merge defaults with provided origins (avoid duplicates)
+    merged = list(dict.fromkeys(defaults + parts))
+    return merged
+
+allowed_origins = _build_allowed_origins(ALLOWED_ORIGIN)
+
+# If wildcard is used we must not enable credentials (browsers reject Access-Control-Allow-Credentials with '*')
+allow_credentials = False if "*" in allowed_origins else True
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
